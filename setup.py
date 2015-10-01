@@ -27,18 +27,18 @@ def read(fname):
 
 data = {
     'name': 'django-rrd',
-    'version': '0.0.1',
+    'version': '0.0.2',
     'author': 'Okami',
     'author_email': 'okami@fuzetsu.info',
-    'description': 'Web frontend to RRDtool based on Django'
+    'description': 'Web frontend to RRDtool based on Django',
     'license': 'GPLv3',
     'keywords': 'django rrd rrdtool',
     'url': 'https://github.com/okami-1/django-rrd',
     'packages': [
-        'django-rrd',
-        'django-rrd.migrations',
-        'django-rrd.management',
-        'django-rrd.management.commands',
+        'djangorrd',
+        'djangorrd.migrations',
+        'djangorrd.management',
+        'djangorrd.management.commands',
     ],
     'long_description': '',
     'classifiers': [
