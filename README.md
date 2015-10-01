@@ -90,4 +90,4 @@ rrd.update(['N:1234'])
 Display graph
 =============
 
-Open a link "/rrd/graph/<name>/" to get a graph.
+Open a link "/rrd/graph/NAME/" to get a graph.
