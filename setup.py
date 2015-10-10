@@ -27,7 +27,7 @@ def read(fname):
 
 data = {
     'name': 'django-rrd',
-    'version': '0.0.2',
+    'version': '0.0.3',
     'author': 'Okami',
     'author_email': 'okami@fuzetsu.info',
     'description': 'Web frontend to RRDtool based on Django',
@@ -48,7 +48,7 @@ data = {
         'Framework :: Django',
     ],
     'install_requires': [
-        'Django >= 1.7',
+        'Django >= 1.8.4',
         'python-rrdtool >= 1.4.7',
     ],
 }

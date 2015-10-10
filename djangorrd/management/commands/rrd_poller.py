@@ -20,13 +20,18 @@ from ...models import RRD
 
 
 class Command(BaseCommand):
+    def add_arguments(self, parser):
+        parser.add_argument('rrd_name', nargs=1, type=str)
+        parser.add_argument('rrdtool_arg', nargs='+', type=str)
+
     def handle(self, *args, **options):
-        if not args or len(args) < 2:
-            print('Usage: ./manage.py rrd_poller <rrd_name> <arg1> [arg2] [arg3] ...')
+        if not options['rrd_name'] or not options['rrdtool_arg']:
+            print('Usage: ./manage.py rrd_poller <rrd_name> <rrdtool_arg1> [rrdtool_arg2] ...')
         else:
             try:
-                rrd = RRD.objects.get(name=args[0])
-                rrd.update(args[1:])
+                rrd_name = options['rrd_name'][0]
+                rrd = RRD.objects.get(name=rrd_name)
+                rrd.update(options['rrdtool_arg'])
                 print('Done')
             except RRD.DoesNotExist:
-                print('RRD with name "%s" does not exists' % args[0])
+                print('RRD with name "%s" does not exists' % rrd_name)
