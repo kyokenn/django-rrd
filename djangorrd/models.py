@@ -111,7 +111,7 @@ class RRD(models.Model):
 
 
 class DataSource(models.Model):
-    rrd = models.ForeignKey(RRD, verbose_name='RRD Database', related_name='dss')
+    rrd = models.ForeignKey(RRD, verbose_name='RRD', related_name='dss')
     name = models.CharField('Variable Name', max_length=255)
     dst = models.CharField('Data Source Type', max_length=32, choices=DST)
     # if None then fallback to step*2 from rrd
@@ -141,10 +141,10 @@ class DataSource(models.Model):
 
 
 class RRA(models.Model):
-    rrd = models.ForeignKey(RRD, verbose_name='RRD Database', related_name='rras')
-    cf = models.CharField('Consolidation Function', max_length=32, choices=CF)
-    xff = models.FloatField('XFF')
-    step = models.IntegerField('Step')
+    rrd = models.ForeignKey(RRD, verbose_name='RRD', related_name='rras')
+    cf = models.CharField('Consolidation Function (CF)', max_length=32, choices=CF)
+    xff = models.FloatField('Xfiles Factor (XFF)')
+    step = models.IntegerField('Steps')
     rows = models.IntegerField('Rows')
 
     def get_args(self):
@@ -173,6 +173,14 @@ class Graph(models.Model):
     color = models.CharField('Color #', max_length=6)
     width = models.IntegerField('Width', help_text='Width in pixels')
     height = models.IntegerField('Height', help_text='Height in pixels')
+    full_size_mode = models.BooleanField(
+        'Full size mode', help_text='If true, the width and height specify the'
+        ' final dimensions of the output image', default=False)
+    border = models.IntegerField('Border', help_text='Border width in pixels')
+    lazy = models.BooleanField(
+        'Lazy', help_text='Only generate the graph if the current graph is'
+        ' out of date or not existent.', default=False)
+    slope_mode = models.BooleanField('Slope mode', default=False)
 
     def get_path(self):
         RRD_DIR = os.path.join(settings.MEDIA_ROOT, 'rrd')
@@ -183,16 +191,23 @@ class Graph(models.Model):
     def graph(self):
         # t = int(calendar.timegm(datetime.datetime.now().timetuple()))
         t = int(time.mktime(datetime.datetime.now().timetuple()))
-        args = (
+        args = [
             self.get_path(),
-            '--title', self.title,
-            '--vertical-label', self.vertical_label,
-            '--imgformat', 'PNG',
-            '--width', str(self.width), '--height', str(self.height),
             '--start', str(int(t - self.period / 2)),
             '--end', str(int(t + self.period / 2)),
-        ) + self.rrd.get_args(self.color)
-        rrdtool.graph(*args)
+            '--title', self.title,
+            '--vertical-label', self.vertical_label,
+            '--width', str(self.width), '--height', str(self.height),
+            '--boreder', str(self.border),
+            '--imgformat', 'PNG',
+        ]
+        if self.full_size_mode:
+            args.append('--lazy')
+        if self.lazy:
+            args.append('--full-size-mode')
+        if self.slope_mode:
+            args.append('--slope-mode')
+        rrdtool.graph(*(tuple(args) + self.rrd.get_args(self.color)))
 
     def get_absolute_url(self):
         return reverse('rrd:graph', kwargs={'slug': self.name})
