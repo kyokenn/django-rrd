@@ -40,9 +40,12 @@ CF = (
 
 class RRD(models.Model):
     name = models.TextField('RRD Name', unique=True)
-    # if None then fallback current
-    start = models.DateTimeField('Start time', blank=True, null=True)
-    step = models.IntegerField('Step', help_text='Step in seconds')
+    start = models.DateTimeField(
+        'Start time', help_text='Start time (current time by default)',
+        blank=True, null=True)
+    step = models.IntegerField(
+        'Step', help_text='Step in seconds (300 by default)',
+        blank=True, null=True)
 
     def _start_tt(self):
         return int(time.mktime(self.start.timetuple()))
@@ -76,6 +79,8 @@ class RRD(models.Model):
     def save(self, **kwargs):
         if not self.start:
             self.start = datetime.datetime.now()
+        if not self.step:
+            self.step = 300
         super().save(**kwargs)
 
         if not self.rrd_exists():
@@ -123,8 +128,8 @@ class DataSource(models.Model):
             'variable_name': self.name,
             'DST': self.dst,
             'heartbeat': self.get_heartbeat(),
-            'min': self.min or 'U',
-            'max': self.max or 'U',
+            'min': 'U' if self.min is None else self.min,
+            'max': 'U' if self.max is None else self.max,
         }
 
     def __str__(self):
