@@ -7,7 +7,7 @@ Requirements
 ============
 
 * Python >= 3.0
-* Django >= 1.7
+* Django >= 1.8
 * python-rrdtool >= 1.4.7
 
 The recommended python-rrdtool fork [python-rrdtool](https://github.com/alertedsnake/python-rrdtool)
