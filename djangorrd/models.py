@@ -195,7 +195,7 @@ class Graph(models.Model):
         rrdtool.graph(*args)
 
     def get_absolute_url(self):
-        return reverse('rrd:graph', kwargs={'pk': self.pk})
+        return reverse('rrd:graph', kwargs={'slug': self.name})
 
     def __str__(self):
         return self.title

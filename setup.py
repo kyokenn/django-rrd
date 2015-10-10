@@ -27,7 +27,7 @@ def read(fname):
 
 data = {
     'name': 'django-rrd',
-    'version': '0.0.4',
+    'version': '0.0.5',
     'author': 'Okami',
     'author_email': 'okami@fuzetsu.info',
     'description': 'Web frontend to RRDtool based on Django',
