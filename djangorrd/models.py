@@ -60,8 +60,10 @@ class RRD(models.Model):
     def rrd_exists(self):
         return os.path.exists(self.get_path())
 
-    def create(self):
+    def create(self, force=False):
         if self.dss.exists() and self.rras.exists():
+            if force and os.path.exists(self.get_path()):
+                os.remove(self.get_path())
             dss = tuple(map(lambda ds: ds.get_args(), self.dss.all()))
             rras = tuple(map(lambda rra: rra.get_args(), self.rras.all()))
             args = (
@@ -190,15 +192,15 @@ class Graph(models.Model):
 
     def graph(self):
         # t = int(calendar.timegm(datetime.datetime.now().timetuple()))
-        t = int(time.mktime(datetime.datetime.now().timetuple()))
+        t = time.mktime(datetime.datetime.now().timetuple())
         args = [
             self.get_path(),
-            '--start', str(int(t - self.period / 2)),
-            '--end', str(int(t + self.period / 2)),
+            '--start', str(int(t - self.period)),
+            '--end', str(int(t)),
             '--title', self.title,
             '--vertical-label', self.vertical_label,
             '--width', str(self.width), '--height', str(self.height),
-            '--boreder', str(self.border),
+            '--border', str(self.border),
             '--imgformat', 'PNG',
         ]
         if self.full_size_mode:
@@ -207,7 +209,8 @@ class Graph(models.Model):
             args.append('--full-size-mode')
         if self.slope_mode:
             args.append('--slope-mode')
-        rrdtool.graph(*(tuple(args) + self.rrd.get_args(self.color)))
+        rrdargs = tuple(args) + self.rrd.get_args(self.color)
+        rrdtool.graph(*rrdargs)
 
     def get_absolute_url(self):
         return reverse('rrd:graph', kwargs={'slug': self.name})

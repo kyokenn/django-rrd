@@ -23,9 +23,7 @@ from .models import RRD, DataSource, RRA, Graph
 
 def regenerate_rrds(modeladmin, request, queryset):
     for rrd in queryset:
-        if os.path.exists(rrd.get_path()):
-            os.remove(rrd.get_path())
-        rrd.create()
+        rrd.create(force=True)
 regenerate_rrds.short_description = 'Regenerate RRDs'
 
 
