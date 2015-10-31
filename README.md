@@ -1,3 +1,8 @@
+Project moved to SourceForge
+----------------------------
+
+Project moved to https://sourceforge.net/p/django-rrd/
+
 django-rrd
 ==========
 
