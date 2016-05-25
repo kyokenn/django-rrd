@@ -23,6 +23,7 @@ import time
 from django.conf import settings
 from django.db import models
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 
 
 DST = (
@@ -80,7 +81,7 @@ class RRD(models.Model):
 
     def save(self, **kwargs):
         if not self.start:
-            self.start = datetime.datetime.now()
+            self.start = timezone.now()
         if not self.step:
             self.step = 300
         super().save(**kwargs)
@@ -172,7 +173,12 @@ class Graph(models.Model):
     title = models.CharField('Title', max_length=255)
     vertical_label = models.CharField('Vertical Label', max_length=255)
     period = models.IntegerField('Period', help_text='Period in seconds')
-    color = models.CharField('Color #', max_length=6)
+    color = models.CharField(
+        'Color #', default='ff0000', max_length=6)
+    background_color = models.CharField(
+        'Background Color #', default='dddddd', max_length=6)
+    canvas_color = models.CharField(
+        'Canvas Color #', default='ffffff', max_length=6)
     width = models.IntegerField('Width', help_text='Width in pixels')
     height = models.IntegerField('Height', help_text='Height in pixels')
     full_size_mode = models.BooleanField(
@@ -191,17 +197,18 @@ class Graph(models.Model):
         return os.path.join(RRD_DIR, '%s.png' % self.pk)
 
     def graph(self):
-        # t = int(calendar.timegm(datetime.datetime.now().timetuple()))
-        t = time.mktime(datetime.datetime.now().timetuple())
+        t = int(time.time())
         args = [
             self.get_path(),
-            '--start', str(int(t - self.period)),
-            '--end', str(int(t)),
+            '--start', str(t - self.period),
+            '--end', str(t),
             '--title', self.title,
             '--vertical-label', self.vertical_label,
             '--width', str(self.width), '--height', str(self.height),
             '--border', str(self.border),
             '--imgformat', 'PNG',
+            '--color', 'BACK#{}'.format(self.background_color),
+            '--color', 'CANVAS#{}'.format(self.canvas_color),
         ]
         if self.full_size_mode:
             args.append('--lazy')

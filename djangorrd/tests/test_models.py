@@ -32,7 +32,8 @@ class ModelsTestCase(TestCase):
             rrd=rrd, cf='AVERAGE', xff=0.5, step=1, rows=24)
         graph = Graph.objects.create(
             rrd=rrd, name='test', title='Test Graph', vertical_label='Units',
-            period=600, color='ff0000', width=500, height=300, border=2)
+            period=600, color='ff0000', background_color='dddddd', canvas_color='ffffff',
+            width=500, height=300, border=2)
 
         rrd.create(force=True)
         rrd.update(['N:10'])
